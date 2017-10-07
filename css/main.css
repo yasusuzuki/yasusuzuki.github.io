@@ -1,0 +1,114 @@
+body {
+    font-family: "Lato", Emoji, Arial, "ヒラギノ角ゴPro W3", "Hiragino Kaku Gothic Pro", "メイリオ", Meiryo, "ＭＳ Ｐゴシック", sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #3c4a60;
+    background-color: #fff;
+
+}
+
+.heading {
+  color: white;
+  background-color:skyblue;
+  width:80%; 
+  margin: 30px auto 40px;	
+  border-color:#
+}
+
+
+.border {
+  width: 80%;
+   margin: 30px auto 40px;
+}
+
+.sidemenu {
+  float:left;
+  width:15%; height:400px;
+  border: 1px solid #E5E5E5;
+  // box-shadow: 2px 2px 2px grey;
+  border-radius: 2px;
+  padding: 5px;
+}
+
+.main {
+  float:right;
+  width:80%; height:400px;
+  border: 1px solid #E5E5E5;
+  //background-color:blue;
+  //box-shadow: 2px 2px 2px grey;
+  border-radius: 5px;
+  padding: 5px;
+
+}
+
+.border::after{
+  content:'';
+  display: block;
+  clear:both;
+}
+
+.footer {
+  background-color:skyblue;
+  margin: 30px auto 40px;
+  width:80%; 
+  color: white;
+
+}
+
+/**********************************************************
+              見出しなどの段落系
+***********************************************************/
+h2 {
+  font-size: 19px;
+  font-weight: normal;
+  margin-top:0px;
+  padding-top:0px;
+  padding-left:10px;
+  background-color:lightgrey;
+  border-radius: 5px;
+  /* text-shadow: 0 0 black; */
+}
+
+h3 {
+  margin: 0px;
+}
+
+ul {
+  margin: 0px;
+}
+
+/**********************************************************
+              ランキングのCSS
+***********************************************************/
+.ranking {
+  counter-reset: ranking;
+  padding: 0px;
+}
+
+.ranking .ranking-item:nth-of-type(even) {
+  background-color: #2196f3;
+}
+
+.ranking-item {
+  list-style-type:none;
+  border: 1px solid #aaa;
+}
+
+.ranking .order{
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  margin: 0 10px;
+  line-height: 18px;
+  text-align: center;
+  color:white;
+  background-color: #dab413;
+  transform: rotate(45deg);
+}
+.ranking .order::before {
+  content: counter(ranking);
+  counter-increment: ranking;
+  display: inline-block;
+  transform: rotate(-45deg);
+
+}
