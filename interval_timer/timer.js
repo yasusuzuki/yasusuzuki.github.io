@@ -1,28 +1,39 @@
 // Credit: Mateusz Rybczonec
 
 const FULL_DASH_ARRAY = 283;
-const WARNING_THRESHOLD = 10;
-const ALERT_THRESHOLD = 5;
+
+const WARMUP_THRESHOLD = 15;
+
+const WORKOUT_THRESHOLD = 50;
+const WARNING_THRESHOLD = 8;
+
+const REST_THRESHOLD = 20;
+
+const ROUND = 8
 
 const COLOR_CODES = {
-  info: {
-    color: "green"
+  workout: {
+    color: "red"
   },
   warning: {
     color: "orange",
     threshold: WARNING_THRESHOLD
   },
-  alert: {
-    color: "red",
-    threshold: ALERT_THRESHOLD
+  rest: {
+    color: "green",
+  },
+  warmup: {
+    color: "grey",
   }
+
 };
 
-const TIME_LIMIT = 20;
-let timePassed = 0;
-let timeLeft = TIME_LIMIT;
+
+let round = 1;
+let roundLeft = ROUND;
+let timeLeft = WARMUP_THRESHOLD;
 let timerInterval = null;
-let remainingPathColor = COLOR_CODES.info.color;
+let remainingPathColor = COLOR_CODES.warmup.color;
 
 document.getElementById("app").innerHTML = `
 <div class="base-timer">
@@ -45,19 +56,72 @@ document.getElementById("app").innerHTML = `
   <span id="base-timer-label" class="base-timer__label">${formatTime(
     timeLeft
   )}</span>
+
 </div>
+<div id="base-timer-round" class="base-timer__label">WARM UP!!</div>
 `;
 
-startTimer();
+  typeOfThisRound = "warmup";
+  timeLimitOnThisRound = WARMUP_THRESHOLD;
+  startTimer();
+  var music = new Audio('Ship_Bell-Mike_Koenig-1911209136.mp3');
+  music.play();  // 再生
 
-function onTimesUp() {
-  clearInterval(timerInterval);
+
+function onTimesUp(){
+  //Switch between workout and rest round
+  if (typeOfThisRound === "workout") {
+    document
+      .getElementById("base-timer-path-remaining")
+      .classList.remove(COLOR_CODES.workout.color);
+    document
+      .getElementById("base-timer-path-remaining")
+      .classList.remove(COLOR_CODES.warning.color);
+    document
+      .getElementById("base-timer-path-remaining")
+      .classList.add(COLOR_CODES.rest.color);
+    typeOfThisRound = "rest";
+    timeLeft = REST_THRESHOLD;
+    timeLimitOnThisRound = REST_THRESHOLD;
+  } else if (typeOfThisRound === "rest"){
+    document
+      .getElementById("base-timer-path-remaining")
+      .classList.remove(COLOR_CODES.rest.color);
+    document
+      .getElementById("base-timer-path-remaining")
+      .classList.add(COLOR_CODES.workout.color);
+    typeOfThisRound = "workout";
+    timeLeft = WORKOUT_THRESHOLD;
+    timeLimitOnThisRound = WORKOUT_THRESHOLD;
+    round++;
+  } else if (typeOfThisRound === "warmup"){
+    document
+      .getElementById("base-timer-path-remaining")
+      .classList.remove(COLOR_CODES.warmup.color);
+    document
+      .getElementById("base-timer-path-remaining")
+      .classList.add(COLOR_CODES.workout.color);
+    typeOfThisRound = "workout";
+    timeLeft = WORKOUT_THRESHOLD;
+    timeLimitOnThisRound = WORKOUT_THRESHOLD;
+
+  }
+
+  if ( round > ROUND ){
+    clearInterval(timerInterval);
+    document.getElementById("base-timer-round").innerHTML = `CLEAR !!!`;
+
+  }else{
+    document.getElementById("base-timer-round").innerHTML = `ROUND ${round}/${ROUND}`;
+    clearInterval(timerInterval);
+    startTimer();
+  }
 }
 
 function startTimer() {
+
   timerInterval = setInterval(() => {
-    timePassed = timePassed += 1;
-    timeLeft = TIME_LIMIT - timePassed;
+    timeLeft = timeLeft - 1;
     document.getElementById("base-timer-label").innerHTML = formatTime(
       timeLeft
     );
@@ -82,27 +146,19 @@ function formatTime(time) {
 }
 
 function setRemainingPathColor(timeLeft) {
-  const { alert, warning, info } = COLOR_CODES;
-  if (timeLeft <= alert.threshold) {
+  if (typeOfThisRound === "workout" && timeLeft <= COLOR_CODES.warning.threshold) {
     document
       .getElementById("base-timer-path-remaining")
-      .classList.remove(warning.color);
+      .classList.remove(COLOR_CODES.workout.color);
     document
       .getElementById("base-timer-path-remaining")
-      .classList.add(alert.color);
-  } else if (timeLeft <= warning.threshold) {
-    document
-      .getElementById("base-timer-path-remaining")
-      .classList.remove(info.color);
-    document
-      .getElementById("base-timer-path-remaining")
-      .classList.add(warning.color);
+      .classList.add(COLOR_CODES.warning.color);
   }
 }
 
 function calculateTimeFraction() {
-  const rawTimeFraction = timeLeft / TIME_LIMIT;
-  return rawTimeFraction - (1 / TIME_LIMIT) * (1 - rawTimeFraction);
+  const rawTimeFraction = timeLeft / timeLimitOnThisRound;
+  return rawTimeFraction - (1 / timeLimitOnThisRound) * (1 - rawTimeFraction);
 }
 
 function setCircleDasharray() {
