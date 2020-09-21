@@ -1,12 +1,11 @@
 // Credit: Mateusz Rybczonec
 
-const FULL_DASH_ARRAY = 283;
-const WARMUP_THRESHOLD = 5;
-const WORKOUT_THRESHOLD = 10;
-const WARNING_THRESHOLD = 3;
-const REST_THRESHOLD = 5;
+const WARMUP_THRESHOLD = 15;
+const WORKOUT_THRESHOLD = 45;
+const WARNING_THRESHOLD = 5;
+const REST_THRESHOLD = 25;
 
-const ROUND = 8;
+const ROUND = 10;
 
 const COLOR_CODES = {
   workout: {
@@ -31,6 +30,19 @@ const COLOR_CODES = {
 
 };
 
+const MENU_LIST = [
+"バーピージャンプ １５回",
+"スクワット　３０回",
+"ももあげ　３０回",
+"ジャンプ　40回",
+"プランク　１分",
+"腹筋 30回",
+"腕立て 15回",
+"ボクシングジャブ　1分",
+"膝をついたまま腕立て　１分"
+
+];
+
 
 var round = 1;
 var countdown = null;
@@ -43,12 +55,12 @@ audiojs.events.ready(function() {
 });
 
 countdown = $("#countdown").countdown360({
-     radius      : 300.5,
+     radius      : 200.5,
      seconds     : stage.time,
      strokeWidth : 50,
      fillStyle   : 'white',
      strokeStyle : stage.color,
-     fontSize    : 300,
+     fontSize    : 200,
      fontColor   : stage.color,
      autostart   : false,
      smooth      : true,
@@ -58,13 +70,18 @@ countdown = $("#countdown").countdown360({
 
 $("#button_reset").prop("disabled",true);
 
+var sound = null;
 $("#button_start").on('click',function(){
   countdown.start();
   $("#button_start").prop("disabled",true);
   $("#button_stop").prop("disabled",false);
 
   //redraw round for restart
-  $("#base-timer-round").text("ROUND" + round + "/" + ROUND);
+  $("#base-timer-round").text(round + "/" + ROUND + " " + MENU_LIST[round-1]);
+  sound = document.getElementById("Sound");
+  //Needs to play sound via user interaction in advance.
+  //TODO: how to avoid playing sound at this time.
+  sound.play();
 
 });
 
@@ -83,16 +100,19 @@ $("#button_stop").on('click',function(){
 });
 
 
-$("#base-timer-round").text("ROUND" + round + "/" + ROUND);
+$("#base-timer-round").text(round + "/" + ROUND + " " + MENU_LIST[round-1]);
 
 function onTimesUp(){
   //Switch between workout and rest round
   if (stage.name === "workout") {
     //update color from workout to warning
     stage = COLOR_CODES.rest;
+    $("#base-timer-round").text( (round+1) + "/" + ROUND + " " + MENU_LIST[round]);
+
   } else if (stage.name === "rest"){
     stage = COLOR_CODES.workout;
     round++;
+
     warning_timer =setTimeout(setWarning,(WORKOUT_THRESHOLD - WARNING_THRESHOLD)*1000);
   } else if (stage.name === "warmup"){
     stage = COLOR_CODES.workout;
@@ -102,7 +122,7 @@ function onTimesUp(){
   if ( round > ROUND ){
     $("#base-timer-round").text("CLEAR !!!");
   }else{
-    $("#base-timer-round").text("ROUND" + round + "/" + ROUND);
+
     console.log(stage.color);
     countdown.stop();
     countdown.pen.strokeStyle = stage.color;
@@ -117,6 +137,5 @@ function setWarning() {
   countdown.pen.strokeStyle = COLOR_CODES.warning.color;
   countdown.settings.fontColor = COLOR_CODES.warning.color;
   clearTimeout(warning_timer);
-  audio[0].play();
-
+  sound.play();
 }
